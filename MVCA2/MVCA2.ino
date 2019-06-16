@@ -12,7 +12,7 @@
 #define CHB4 24
 // I²C on 20 and 21
 
-int pinPWM[] =    {10, 11, 12, 13};
+int pinPWM[] =    {10, 11, 12, 44};
 int pinDir[] =    {30, 31, 32, 33};
 int SHUTLASER[] = {6 , 7, 8, 9};
 
@@ -36,7 +36,7 @@ VL53L1X lasers[4];
 
 // sampling rate (ms)
 int dtMs = 10;
-int Vmax = 100;
+int Vmax = 50;
 int Kp = 1;
 float Ki = 0.0;
 int freq;
