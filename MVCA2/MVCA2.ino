@@ -36,8 +36,8 @@ VL53L1X lasers[4];
 
 // sampling rate (ms)
 int dtMs = 10;
-int Vmax = 50;
-int Kp = 1;
+int Vmax = 30;
+int Kp = 2;
 float Ki = 0.0;
 int freq;
 
@@ -233,17 +233,17 @@ void incDec2() {
 }
 void incDec3() {
   if (digitalRead(CHA3) && !digitalRead(CHB3)) {
-    realPos[2]++;
+    realPos[2]--;
   }
   if (digitalRead(CHA3) && digitalRead(CHB3)) {
-    realPos[2]--;
+    realPos[2]++;
   }
 }
 void incDec4() {
   if (digitalRead(CHA4) && !digitalRead(CHB4)) {
-    realPos[3]++;
+    realPos[3]--;
   }
   if (digitalRead(CHA4) && digitalRead(CHB4)) {
-    realPos[3]--;
+    realPos[3]++;
   }
 }
