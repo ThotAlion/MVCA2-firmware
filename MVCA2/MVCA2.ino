@@ -17,6 +17,8 @@ int pinDir[] =    {30, 31, 32, 33};
 int SHUTLASER[] = {6 , 7, 8, 9};
 
 int realPos[] =     {0, 0, 0, 0};
+int change = 0;
+int verb = 1;
 int desiredPos[] =  {0, 0, 0, 0};
 int desiredVit[] =  {0, 0, 0, 0};
 int rangemm[] =     {0, 0, 0, 0};
@@ -37,7 +39,7 @@ VL53L1X lasers[4];
 // sampling rate (ms)
 int dtMs = 10;
 int Vmax = 30;
-int Kp = 2;
+float Kp = 2.0;
 float Ki = 0.0;
 int freq;
 
@@ -61,10 +63,10 @@ void setup() {
   }
 
   //trigger interrupt on channel A
-  attachInterrupt(digitalPinToInterrupt(CHA1), incDec1, RISING);
-  attachInterrupt(digitalPinToInterrupt(CHA2), incDec2, RISING);
-  attachInterrupt(digitalPinToInterrupt(CHA3), incDec3, RISING);
-  attachInterrupt(digitalPinToInterrupt(CHA4), incDec4, RISING);
+  attachInterrupt(digitalPinToInterrupt(CHA1), incDec1, CHANGE );
+  attachInterrupt(digitalPinToInterrupt(CHA2), incDec2, CHANGE );
+  attachInterrupt(digitalPinToInterrupt(CHA3), incDec3, CHANGE );
+  attachInterrupt(digitalPinToInterrupt(CHA4), incDec4, CHANGE );
   Serial.begin(115200);
   Wire.begin();
   Wire.setClock(400000);
@@ -141,19 +143,14 @@ void loop() {
           } else if (id == 5) {
             Vmax = param;
           } else if (id == 6) {
-            Kp = param;
+            Kp = param/10.0;
+          } else if (id == 7) {
+            Ki = param/100.0;
           }
           serialState = 0;
           break;
       }
       inputString = "";
-      /*Serial.print("desiredVit");
-      Serial.println(desiredVit[0]);
-      Serial.print("desiredPos");
-      Serial.println(desiredPos[0]);
-      Serial.print("state");
-      Serial.println(state[0]);*/
-      
     }else{
       inputString += inChar;
     }
@@ -167,12 +164,11 @@ void loop() {
       rangemm[imotor] = 1000;
     }
     //print
-    /*Serial.print(imotor);
-    Serial.print(":");
-    Serial.print(realPos[imotor]);
-    Serial.print(";");
-    Serial.print(rangemm[imotor]);
-    Serial.println(".");*/
+    if(change==1 && verb == 1){
+      Serial.print(imotor);
+      Serial.print(":");
+      Serial.print(realPos[imotor]);
+    }
     // choose speed
     int v = 0;
     switch (state[imotor]) {
@@ -209,6 +205,7 @@ void loop() {
       digitalWrite(pinDir[imotor], LOW);
     }
   }
+  if(change == 1){change=0;}
   delay(dtMs);
 }
 
@@ -217,33 +214,57 @@ void loop() {
 // INTERRUPTS
 void incDec1() {
   if (digitalRead(CHA1) && !digitalRead(CHB1)) {
-    realPos[0]++;
+    realPos[0]--;change = 1;
   }
   if (digitalRead(CHA1) && digitalRead(CHB1)) {
-    realPos[0]--;
+    realPos[0]++;change = 1;
+  }
+  if (!digitalRead(CHA1) && digitalRead(CHB1)) {
+    realPos[0]--;change = 1;
+  }
+  if (!digitalRead(CHA1) && !digitalRead(CHB1)) {
+    realPos[0]++;change = 1;
   }
 }
 void incDec2() {
   if (digitalRead(CHA2) && !digitalRead(CHB2)) {
-    realPos[1]++;
+    realPos[1]++;change = 1;
   }
   if (digitalRead(CHA2) && digitalRead(CHB2)) {
-    realPos[1]--;
+    realPos[1]--;change = 1;
+  }
+  if (!digitalRead(CHA2) && digitalRead(CHB2)) {
+    realPos[1]++;change = 1;
+  }
+  if (!digitalRead(CHA2) && !digitalRead(CHB2)) {
+    realPos[1]--;change = 1;
   }
 }
 void incDec3() {
   if (digitalRead(CHA3) && !digitalRead(CHB3)) {
-    realPos[2]--;
+    realPos[2]--;change = 1;
   }
   if (digitalRead(CHA3) && digitalRead(CHB3)) {
-    realPos[2]++;
+    realPos[2]++;change = 1;
+  }
+  if (!digitalRead(CHA3) && digitalRead(CHB3)) {
+    realPos[2]--;change = 1;
+  }
+  if (!digitalRead(CHA3) && !digitalRead(CHB3)) {
+    realPos[2]++;change = 1;
   }
 }
 void incDec4() {
   if (digitalRead(CHA4) && !digitalRead(CHB4)) {
-    realPos[3]--;
+    realPos[3]--;change = 1;
   }
   if (digitalRead(CHA4) && digitalRead(CHB4)) {
-    realPos[3]++;
+    realPos[3]++;change = 1;
+  }
+  if (!digitalRead(CHA4) && digitalRead(CHB4)) {
+    realPos[3]--;change = 1;
+  }
+  if (!digitalRead(CHA4) && !digitalRead(CHB4)) {
+    realPos[3]++;change = 1;
   }
 }
