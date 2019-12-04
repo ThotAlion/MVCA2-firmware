@@ -40,6 +40,7 @@ VL53L1X lasers[4];
 int dtMs = 10;
 int Vmax = 30;
 float Kp = 2.0;
+float KKp[] = {1.0, 1.0, 1.0, 1.0};
 float Ki = 0.0;
 int freq;
 
@@ -167,7 +168,7 @@ void loop() {
     if(change==1 && verb == 1){
       Serial.print(imotor);
       Serial.print(":");
-      Serial.print(realPos[imotor]);
+      Serial.println(realPos[imotor]);
     }
     // choose speed
     int v = 0;
@@ -178,7 +179,7 @@ void loop() {
       case 3:
         error = realPos[imotor]-desiredPos[imotor];
         errorInt+=error;
-        v = (int)(Kp*error+Ki*errorInt);
+        v = (int)(KKp[imotor]*Kp*error+Ki*errorInt);
         break;  
       default:
         v = 0;
@@ -214,30 +215,30 @@ void loop() {
 // INTERRUPTS
 void incDec1() {
   if (digitalRead(CHA1) && !digitalRead(CHB1)) {
-    realPos[0]--;change = 1;
+    realPos[0]++;change = 1;
   }
   if (digitalRead(CHA1) && digitalRead(CHB1)) {
-    realPos[0]++;change = 1;
-  }
-  if (!digitalRead(CHA1) && digitalRead(CHB1)) {
     realPos[0]--;change = 1;
   }
-  if (!digitalRead(CHA1) && !digitalRead(CHB1)) {
+  if (!digitalRead(CHA1) && digitalRead(CHB1)) {
     realPos[0]++;change = 1;
+  }
+  if (!digitalRead(CHA1) && !digitalRead(CHB1)) {
+    realPos[0]--;change = 1;
   }
 }
 void incDec2() {
   if (digitalRead(CHA2) && !digitalRead(CHB2)) {
-    realPos[1]++;change = 1;
+    realPos[1]--;change = 1;
   }
   if (digitalRead(CHA2) && digitalRead(CHB2)) {
-    realPos[1]--;change = 1;
-  }
-  if (!digitalRead(CHA2) && digitalRead(CHB2)) {
     realPos[1]++;change = 1;
   }
-  if (!digitalRead(CHA2) && !digitalRead(CHB2)) {
+  if (!digitalRead(CHA2) && digitalRead(CHB2)) {
     realPos[1]--;change = 1;
+  }
+  if (!digitalRead(CHA2) && !digitalRead(CHB2)) {
+    realPos[1]++;change = 1;
   }
 }
 void incDec3() {
